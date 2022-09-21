@@ -30,7 +30,12 @@ export const OnSubmit = async (
           items: formatNewRequest(formValues, nextClientNumber),
           ListItemEntityTypeFullName,
         });
-        sendNotification(formValues, 'ExpenseAuthority', nextClientNumber);
+        sendNotification({
+          formValues: formValues,
+          notificationKey: 'ExpenseAuthority',
+          nextClientNumber: nextClientNumber,
+          sendTo: ['i:0ǵ.t|bcgovidp|fc9f8c4adca2445f80e247555906c873'],
+        });
       } catch (error) {}
       break;
 
@@ -62,8 +67,19 @@ export const OnSubmit = async (
           listName: 'Submitted Requests',
           items: updateRequest(formValues, 'Approved'),
         });
-        sendNotification(formValues, 'TeamWelcome'); //team notification
-        sendNotification(formValues, 'GDXApproved'); //GDX notification
+
+        sendNotification({
+          formValues: formValues,
+          notificationKey: 'TeamWelcome',
+          nextClientNumber: nextClientNumber,
+          sendTo: [formValues.ApproverName],
+        }); //team notification
+        sendNotification({
+          formValues: formValues,
+          notificationKey: 'GDXApproved',
+          nextClientNumber: nextClientNumber,
+          sendTo: [formValues.ApproverName],
+        }); //GDX notification
       } catch (error) {
         console.log(`error`, error);
       }

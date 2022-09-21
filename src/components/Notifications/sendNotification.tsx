@@ -2,22 +2,29 @@ import { SendEmail, GetUser } from 'components/ApiCalls';
 import { IreplacementPair } from '../Interfaces';
 import { GetListItems, GetCurrentUser } from '../ApiCalls';
 
-export const sendNotification = async (
-  formValues: any,
-  notificationKey: string,
-  nextClientNumber?: number
-) => {
+export const sendNotification = async ({
+  formValues,
+  notificationKey,
+  sendTo,
+  nextClientNumber,
+}: {
+  formValues: any;
+  notificationKey: string;
+  sendTo?: Array<string>;
+  nextClientNumber?: number;
+}) => {
+  console.log('formValues', formValues);
   const currentUser: any = await GetCurrentUser();
 
   const standardReplacementPairs: any = {
     '[SubmitterDisplayName]': currentUser.Title, //!replace with submitter variable
     '[SiteLink]': `<a href='${_spPageContextInfo.webAbsoluteUrl}'>${_spPageContextInfo.webTitle}</a>`,
-    '[ExpenseAuthority]': <b>{formValues.CASExpAuth}</b>,
-    '[ClientAccountName]': <b>{formValues.ClientName}</b>,
+    '[ExpenseAuthority]': `<b>${formValues.CASExpAuth}</b>`,
+    '[ClientTeamName]': `<b>${formValues.ClientTeamName}</b>`,
     '[ClientAccountNumber]': nextClientNumber,
-    '[PrimaryContact]': <b>{formValues.PrimaryContact}</b>,
-    '[Approvers]': <b>{formValues.Approver}</b>,
-    '[FinancialContacts]': <b>{formValues.FinContact}</b>,
+    '[PrimaryContact]': `<b>${formValues.PrimaryContact}</b>`,
+    '[Approvers]': `<b>${formValues.Approver}</b>`,
+    '[FinancialContacts]': `<b>${formValues.FinContact}</b>`,
   };
 
   const allNotifications: any = await GetListItems({
@@ -29,8 +36,8 @@ export const sendNotification = async (
     for (let i = 0; i < allNotifications.length; i++) {
       if (allNotifications[i].key === notificationKey) {
         tempBody = allNotifications[i].body.replace(
-          /\[SubmitterDisplayName\]|\[ExpenseAuthority\]|\[FinancialContacts\]|\[ClientAccountName\]|\[ClientAccountNumber\]|\[PrimaryContact\]|\[Approvers\]|\[SiteLink\]/gi,
-          function (matched: any) {
+          /\[SubmitterDisplayName\]|\[ExpenseAuthority\]|\[FinancialContacts\]|\[ClientTeamName\]|\[ClientAccountNumber\]|\[PrimaryContact\]|\[Approvers\]|\[SiteLink\]/gi,
+          (matched: any) => {
             return standardReplacementPairs[matched];
           }
         );
@@ -48,10 +55,7 @@ export const sendNotification = async (
   };
 
   await SendEmail({
-    to: [
-      'i:0ǵ.t|bcgovidp|fc2ed940df8a443db9eab7c8769b9840',
-      'i:0ǵ.t|bcgovidp|1e9f2b4e96094ae2a9cba4387a9f668d',
-    ], //!needs to be updated
+    to: sendTo, //!needs to be updated
     subject: subject(),
     body: body(),
     cc: [currentUser.LoginName],

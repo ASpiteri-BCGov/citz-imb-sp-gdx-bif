@@ -30,6 +30,7 @@ export const useNotification = () => {
     },
     {
       searchValue: '[SiteLink]',
+      //TODO update link to go to intake form page
       replacementValue: `<a href='${_spPageContextInfo.webAbsoluteUrl}'>${_spPageContextInfo.webTitle}</a>`,
     },
   ];
